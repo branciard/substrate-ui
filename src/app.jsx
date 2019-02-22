@@ -21,6 +21,24 @@ import {Pretty} from './Pretty';
 import { TaskCards } from './TaskCards';
 
 
+/*
+
+/*
+<SignerBond bond={this.skAccount}/>
+<InputBond bond={this.assetName} placeholder='Kitty name' validator={n => stringToBytes(n) || null} />
+<TransactButton
+    content="Create Kitty"
+    icon='paw'
+    tx={{
+        sender: runtime.indices.tryIndex(this.skAccount),
+        call: calls.substratekitties.createKitty(this.assetName)
+    }}
+/>
+
+*/
+
+
+
 export class App extends ReactiveComponent {
 	constructor () {
 		super([], { ensureRuntime: runtimeUp })
@@ -45,6 +63,13 @@ export class App extends ReactiveComponent {
 		this.runtime = new Bond;
 		this.accountCreateTask = new Bond;
 		this.accountContribution = new Bond;
+		this.contributionTaskId=new Bond;
+		this.contribution=new Bond;
+		this.contributionSeal=new Bond;
+		this.accountReveal = new Bond;
+		this.revealTaskId=new Bond;
+		this.contributionUnseal=new Bond;
+
 
 		addCodecTransform('Task<Hash>', {
 			id: 'Hash',
@@ -150,19 +175,89 @@ export class App extends ReactiveComponent {
 				<Header as='h2'>
 					<Icon name='cogs' />
 					<Header.Content>
-						Off-chain Workers Contributions on Task
-						<Header.Subheader>Poc for Task, workers contributions, staking, reward  ...</Header.Subheader>
+						Off-chain Workers Contribute
+						<Header.Subheader>Workers stake for contribute ...</Header.Subheader>
 					</Header.Content>
 				</Header>
 
 				<div style={{ paddingBottom: '1em' }}></div>
 				<div style={{paddingBottom: '1em'}}>
+				<div style={{fontSize: 'small'}}>Contribution</div>
+
+
+				<InputBond
+					bond={this.contributionTaskId}
+					placeholder='Task Id'
+					validator={n => n || null}
+				/>
+
+
+				<InputBond
+					bond={this.contribution}
+					placeholder='Contribution Vote'
+					validator={n => n || null}
+				/>
+
+				<InputBond
+					bond={this.contributionSeal}
+					placeholder='Contribution Sealed'
+					validator={n => n || null}
+				/>
+
 					<div style={{fontSize: 'small'}}>Worker</div>
+
 					<SignerBond bond={this.accountContribution}/>	
+					<TransactButton
+							content="Stake And Contribute"
+							icon='cog'
+							tx={{
+								sender: runtime.indices.tryIndex(this.accountContribution),
+								call: calls.iexec.contribute(this.contributionTaskId,this.contribution,this.contributionSeal)
+							}}
+						/>	
+		
 				</div>
-
-
 			</Segment>
+			<Divider hidden />
+
+			<Segment style={{margin: '1em'}} padded>
+				<Header as='h2'>
+					<Icon name='cogs' />
+					<Header.Content>
+						Off-chain Workers Reveal 
+						<Header.Subheader>Workers reveal and get rewarded if part of the consensus...</Header.Subheader>
+					</Header.Content>
+				</Header>
+				<div style={{ paddingBottom: '1em' }}></div>
+				<div style={{paddingBottom: '1em'}}>
+				<div style={{fontSize: 'small'}}>Unseal Contribution</div>
+
+				<InputBond
+					bond={this.revealTaskId}
+					placeholder='Task Id'
+					validator={n => n || null}
+				/>
+
+				<InputBond
+					bond={this.contributionUnseal}
+					placeholder='Contribution unsealed'
+					validator={n => n || null}
+				/>
+
+				<div style={{fontSize: 'small'}}>Worker</div>
+
+				<SignerBond bond={this.accountReveal}/>	
+				<TransactButton
+					content="Reveal and Reward"
+					icon='cog'
+					tx={{
+						sender: runtime.indices.tryIndex(this.accountReveal),
+						call: calls.iexec.reveal(this.revealTaskId,this.contributionUnseal)
+					}}
+				/>	
+				</div>
+			</Segment>
+
 			<Divider hidden />
 			<Segment style={{margin: '1em'}} padded>
 				<Header as='h2'>

@@ -14,16 +14,21 @@ class TaskCard extends ReactiveComponent {
 
     readyRender() {
         let task = this.state.task;
-        return <Card>
-
-        <Card.Content>
-            <Card.Header><Pretty value={task.id} className="limit-name" /></Card.Header>
-            <Card.Meta>
-            <Pretty value={task.consensus} className="limit-consensus" />
-            </Card.Meta>
-  
-        </Card.Content>
-    </Card>;
+        return (
+            <div>
+                <div>
+            
+            TaskId :<Pretty value={task.id} />
+            </div>
+            <div>
+            Task consensus :
+            <Pretty value={task.consensus}  />
+            </div>  
+            <div>
+            Contributions Received :
+            <Pretty value={runtime.iexec.contributionsCount(task.id)}  />
+            </div>  
+        </div>);
        /* 
        
        
@@ -99,6 +104,6 @@ export class TaskCards extends ReactiveComponent {
             );
         }
         
-        return <div className="ui stackable six column grid">{tasks}</div>;
+        return <div>{tasks}</div>;
     }
 }
