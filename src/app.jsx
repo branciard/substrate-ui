@@ -4,7 +4,9 @@ const { generateMnemonic } = require('bip39')
 import {Icon, List, Label, Header, Segment, Divider, Button} from 'semantic-ui-react';
 import {Bond, TransformBond} from 'oo7';
 import {ReactiveComponent, If, Rspan} from 'oo7-react';
-import {calls, runtime, chain, system, runtimeUp, ss58Encode, addressBook, secretStore} from 'oo7-substrate';
+import {calls, runtime, chain, system, runtimeUp, ss58Encode, addressBook, secretStore,addCodecTransform} from 'oo7-substrate';
+
+
 import Identicon from 'polkadot-identicon';
 import {AccountIdBond, SignerBond} from './AccountIdBond.jsx';
 import {BalanceBond} from './BalanceBond.jsx';
@@ -16,6 +18,8 @@ import {WalletList, SecretItem} from './WalletList';
 import {AddressBookList} from './AddressBookList';
 import {TransformBondButton} from './TransformBondButton';
 import {Pretty} from './Pretty';
+import { TaskCards } from './TaskCards';
+
 
 export class App extends ReactiveComponent {
 	constructor () {
@@ -39,9 +43,17 @@ export class App extends ReactiveComponent {
 		this.seedAccount = this.seed.map(s => s ? secretStore().accountFromPhrase(s) : undefined)
 		this.seedAccount.use()
 		this.runtime = new Bond;
+		this.accountCreateTask = new Bond;
+		this.accountContribution = new Bond;
+
+		addCodecTransform('Task<Hash>', {
+			id: 'Hash',
+			consensus: 'Hash'
+		});
 	}
 
 	readyRender() {
+
 		return (<div>
 			<div>
 				<Label>Name <Label.Detail>
@@ -101,6 +113,55 @@ export class App extends ReactiveComponent {
 				<div style={{paddingBottom: '1em'}}>
 					<WalletList/>
 				</div>
+			</Segment>
+			<Divider hidden />
+			<Segment style={{margin: '1em'}} padded>
+				<Header as='h2'>
+					<Icon name='tasks' />
+					<Header.Content>
+						Off-chain Tasks
+						<Header.Subheader>Poc for Task, workers contributions, staking, reward  ...</Header.Subheader>
+					</Header.Content>
+				</Header>
+  				<div style={{paddingBottom: '1em'}}>
+					<div style={{fontSize: 'small'}}>Total Tasks :</div>
+					<Label.Detail>
+								<Pretty value={runtime.iexec.allTasksCount}/>
+					</Label.Detail>
+				</div>
+				<div style={{ paddingBottom: '1em' }}></div>
+				<TaskCards count={runtime.iexec.allTasksCount} />
+				<div style={{ paddingBottom: '1em' }}></div>
+				<div style={{paddingBottom: '1em'}}>
+					<div style={{fontSize: 'small'}}>Scheduler</div>
+					<SignerBond bond={this.accountCreateTask}/>
+					<TransactButton
+						content="Create task"
+						icon='tasks'
+						tx={{
+							sender: runtime.indices.tryIndex(this.accountCreateTask),
+							call: calls.iexec.createTask()
+						}}
+					/>			
+				</div>
+			</Segment>
+			<Divider hidden />
+			<Segment style={{margin: '1em'}} padded>
+				<Header as='h2'>
+					<Icon name='cogs' />
+					<Header.Content>
+						Off-chain Workers Contributions on Task
+						<Header.Subheader>Poc for Task, workers contributions, staking, reward  ...</Header.Subheader>
+					</Header.Content>
+				</Header>
+
+				<div style={{ paddingBottom: '1em' }}></div>
+				<div style={{paddingBottom: '1em'}}>
+					<div style={{fontSize: 'small'}}>Worker</div>
+					<SignerBond bond={this.accountContribution}/>	
+				</div>
+
+
 			</Segment>
 			<Divider hidden />
 			<Segment style={{margin: '1em'}} padded>
