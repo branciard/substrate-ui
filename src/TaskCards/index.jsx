@@ -16,18 +16,22 @@ class TaskCard extends ReactiveComponent {
         let task = this.state.task;
         return (
             <div>
+                <div>        
+                TaskId :<Pretty value={task.id} />
+                </div>
+                <div>        
+                Task consensus threshold :<Pretty value={task.threshold} />
+                </div>
                 <div>
-            
-            TaskId :<Pretty value={task.id} />
-            </div>
-            <div>
-            Task consensus :
-            <Pretty value={task.consensus}  />
+                Task consensus :
+                <Pretty value={runtime.iexec.tasksConsensus(task.id)}  />
+                </div>  
+                <div>
+                Contributions Received :
+                <Pretty value={runtime.iexec.contributionsCount(task.id)}  />
             </div>  
-            <div>
-            Contributions Received :
-            <Pretty value={runtime.iexec.contributionsCount(task.id)}  />
-            </div>  
+
+            ----------------------------------------------
         </div>);
        /* 
        
@@ -99,7 +103,7 @@ export class TaskCards extends ReactiveComponent {
         for (var i=0; i < this.state.count; i++){
             tasks.push(
                 <div className="column" key={i}>
-                    <TaskWrap hash={runtime.iexec.allTasksArray(i)} />
+                     <TaskWrap hash={runtime.iexec.allTasksArray(i)} />
                 </div>
             );
         }

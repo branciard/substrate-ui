@@ -64,6 +64,7 @@ export class App extends ReactiveComponent {
 		this.accountCreateTask = new Bond;
 		this.accountContribution = new Bond;
 		this.contributionTaskId=new Bond;
+		this.replicationTaskId=new Bond;
 		this.contribution=new Bond;
 		this.contributionSeal=new Bond;
 		this.accountReveal = new Bond;
@@ -73,7 +74,7 @@ export class App extends ReactiveComponent {
 
 		addCodecTransform('Task<Hash>', {
 			id: 'Hash',
-			consensus: 'Hash'
+			threshold: 'u64'
 		});
 	}
 
@@ -157,15 +158,25 @@ export class App extends ReactiveComponent {
 				<div style={{ paddingBottom: '1em' }}></div>
 				<TaskCards count={runtime.iexec.allTasksCount} />
 				<div style={{ paddingBottom: '1em' }}></div>
+
+				<div style={{ paddingBottom: '1em' }}>
+				<div style={{fontSize: 'small'}}>Replication for consensus</div>
+				<InputBond
+					bond={this.replicationTaskId}
+					placeholder='Replication for consensus'
+					validator={n => n || null}
+					/>
+				</div>
 				<div style={{paddingBottom: '1em'}}>
 					<div style={{fontSize: 'small'}}>Scheduler</div>
+				
 					<SignerBond bond={this.accountCreateTask}/>
 					<TransactButton
 						content="Create task"
 						icon='tasks'
 						tx={{
 							sender: runtime.indices.tryIndex(this.accountCreateTask),
-							call: calls.iexec.createTask()
+							call: calls.iexec.createTask(this.replicationTaskId)
 						}}
 					/>			
 				</div>
